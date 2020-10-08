@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+</head>
+
+<body>
+    <script src="../js/jquery.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <div class="container-fluid">
+        <h3 class="wq-title">
+
+            第三组人员信息
+            <button type="button" class="btnAdd" data-toggle="modal" data-target=".wq-add">
+                <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+                添加成员
+            </button>
+        </h3>
+        <!-- 添加错题部分 -->
+        <div class="modal fade wq-add">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <!--细节划分-->
+                    <h4>请详细填写重点信息:</h4>
+                    <div class="form-group">
+                        <label for="name">姓名</label>
+                        <input type="text" class="form-control" id="name" placeholder="姓名" value="王二麻子">
+                    </div>
+                    <div class="form-group">
+                        <label for="sex">性别</label>
+                        <textarea id="sex" class="form-control" rows="2" placeholder="男/女"
+                            value="闭包的原理略有模糊现在已经了解"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="title">专长</label>
+                        <textarea id="specialty" class="form-control" rows="2" placeholder="你的专业技能及特长"
+                            value="闭包利用了垃圾回收机制，在每个函数执行的时候，都会产生一个活动对象，这个活动对象会在函数执行结束之后删除，但是内存的垃圾回收机制会保留已经储存的数据，该数据可查询，闭包就是利用这个原理对已经删除的数据进行查询"></textarea>
+                    </div>
+                    <div class="text-center">
+                        <button type="button" class="btn btn-success" data-dismiss="modal"
+                            id="wq-save-question">提交</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--错题表格-->
+        <div class="row">
+            <table class="table table-bordered table-hover wq-main-table ">
+                <!--错题项目-->
+                <thead>
+                    <tr>
+                        <th class="col-md-1 text-center">#</th>
+                        <th class="col-md-3 text-center">姓名</th>
+                        <th class="col-md-3 text-center">性别</th>
+                        <th class="col-md-3 text-center">专长</th>
+                        <th class="col-md-1 text-center">删除</th>
+                        <th class="col-md-1 text-center">操作</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody">
+
+                    <!--<tr class="text-center middle">
+						<td>**索引**</td>
+						<td>**标题**</td>
+						<td>**副标题**</td>
+						<td>
+							<a 
+								href="#" 
+								data-toggle="popover"
+								data-content="**过长内容详情(bootstrap会处理点击显示)**" 
+							>**过长隐藏内容**
+							</a>
+						</td>
+						<td>
+							<button class="btn delBtn">删除</button>
+						</td>
+						<td>
+							<button class="btn">
+								<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+							</button>
+						</td>
+					</tr>-->
+
+
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+    <script>
+        function $(id) {
+            return document.getElementById(id);
+        }
+
+        let name = $("name");
+        let sex = $("sex");
+        let specialty = $("specialty");
+        let link = $("wq-save-question");
+        let tbody = $("tbody");
+
+        axios.get("http://localhost:3000/products").then(res => {
+            var data = res.data;
+
+
+            let str = "";
+            for (let i = 0; i < data.length; i++) {
+                str += `
+            <tr class="text-center middle">
+            <td>${data[i].id}</td>
+            <td>${data[i].name}</td>
+            <td>${data[i].sex}</td>
+            <td>${data[i].specialty}</td>
+           
+            <td>
+                <button class="btn delBtn" data-id="${data[i].id}">删除</button>
+            </td>
+            <td>
+                <button class="btn">
+                    <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+                </button>
+            </td>
+        </tr>
+            `;
+            }
+
+            tbody.innerHTML = str;
+
+
+            let btn = document.querySelectorAll(".btn");
+            for (let i = 0; i < btn.length; i++) {
+                btn[i].onclick = function () {
+                    let id = btn[i].getAttribute("data-id");
+                    axios.delete(`http://localhost:3000/products/${id}`).then(res => {
+                        location.reload();
+                    });
+                }
+            }
+
+            //添加功能
+            // let link = document.getElementById("link");
+            console.log(link);
+            console.log(name);
+            link.onclick = function () {
+                axios.post("http://localhost:3000/products", {
+                    name: name.value,
+                    sex: sex.value,
+                    specialty: specialty.value,
+
+                }).then(res => {
+                      location.reload();
+                });
+            }
+
+
+        });
+
+    </script>
+</body>
+
+</html>
